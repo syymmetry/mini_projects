@@ -1,11 +1,12 @@
 #include "engine/core.h"
+#include "engine/audio.h"
 #include "game/menu.h"
 #include "game/game.h"
 
-int main(int argc, char* argv[]) {
+int main(void) {
     // init engine
     if (!Core_Init()) {
-        printf("[ERROR] Не удалось инициализировать движок!\n");
+        printf("Failed to initialize engine!\n");
         return -1;
     }
 
@@ -19,34 +20,20 @@ int main(int argc, char* argv[]) {
     SDL_Event event;
 
     while (isRunning) {
-        // Event Handling
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 isRunning = false;
             }
-
-            // Sending events to menu/game
-            if (Game_IsRunning()) {
-                Game_HandleEvent(&event);
-            } else {
-                Menu_HandleEvent(&menu, &event);
-            }
+            Menu_HandleEvent(&menu, &event); // Только обработка меню
         }
 
-        // cleaning screen
         SDL_SetRenderDrawColor(Core_GetRenderer(), 0, 0, 0, 255);
         SDL_RenderClear(Core_GetRenderer());
-
-        // Drawing the current state (menu/game)
-        if (Game_IsRunning()) {
-            Game_Render();
-        } else {
-            Menu_Render(&menu, Core_GetRenderer());
-        }
-
-        // update screen
+        
+        Menu_Render(&menu, Core_GetRenderer()); // Только рендер меню
+        
         SDL_RenderPresent(Core_GetRenderer());
-        SDL_Delay(16);  // ~60 FPS
+        SDL_Delay(16);
     }
 
     // Resource release

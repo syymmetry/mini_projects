@@ -1,11 +1,11 @@
-#include <core.h>
+#include "core.h"
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 
 bool Core_Init() {
-    if ((SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
-        printf("[SDL2] Ошибка инициализации: %s\n", SDL_GetError());
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
         return false;
     }
 
@@ -17,7 +17,7 @@ bool Core_Init() {
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
     );
     if (!window) {
-        printf("[SDL2] window creation error: %s\n", SDL_GetError());
+        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
     }
 
 
@@ -27,25 +27,25 @@ bool Core_Init() {
         SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
     );
     if(!renderer) {
-        printf("[SDL2] render creation error: %s\n", SDL_GetError());
+        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
     }
 
     // init SDL_IMG
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-        printf("[SDL2_image] initialization error: s\n", IMG_GetError());
+        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
         return false;
     }
 
     // init SDL_Mixer
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        printf("[SDL2_Mixer] initialization error: s\n", Mix_GetError());
+        printf("[SDL2_Mixer] initialization error: %s\n", Mix_GetError());
         return false;
     }
 
 
     // init SDL_TTF_
     if (TTF_Init() < 0) {
-        printf("[SDL2_TTF] initialization error: s\n", TTF_GetError());
+        printf("[SDL2_TTF] initialization error: %s\n", TTF_GetError());
         return false;
     }
 
@@ -53,7 +53,7 @@ bool Core_Init() {
     return true;
 }
 
-void Core_Shotdown() {
+void Core_Shutdown() {
     if (renderer) SDL_DestroyRenderer(renderer);
     if (window) SDL_DestroyWindow(window);
     Mix_CloseAudio();
