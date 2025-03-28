@@ -1,34 +1,32 @@
 #include "core.h"
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
-static SDL_Window* window = NULL;
-static SDL_Renderer* renderer = NULL;
 
-bool Core_Init() {
+bool Core_Init(Core* core, const char* title, int w, int h) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
-        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
+        printf("SDL_Init error: %s\n", SDL_GetError());
         return false;
     }
 
-    window = SDL_CreateWindow(
-        "Hungry snake",
+    core->window = SDL_CreateWindow(
+        title,
         SDL_WINDOWPOS_CENTERED,
         SDL_WINDOWPOS_CENTERED,
-        800, 600,
-        SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+        w, h,
+        SDL_WINDOW_SHOWN
     );
-    if (!window) {
-        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
-    }
+    if (!core->window) return false;
 
-
-    renderer = SDL_CreateRenderer(
-        window,
+    // init render
+    core->renderer = SDL_CreateRenderer(
+        core->window,
         -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+        SDL_RENDERER_ACCELERATED
     );
-    if(!renderer) {
-        printf("[SDL2_image] initialization error: %s\n", IMG_GetError());
-    }
+    if (!core->renderer) return false;
+
 
     // init SDL_IMG
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
@@ -49,13 +47,14 @@ bool Core_Init() {
         return false;
     }
 
-
+    core->width = w;
+    core->height = h;
     return true;
 }
 
 void Core_Shutdown() {
-    if (renderer) SDL_DestroyRenderer(renderer);
-    if (window) SDL_DestroyWindow(window);
+    if (core->renderer) SDL_DestroyRenderer(core->renderer);
+    if (core->window) SDL_DestroyWindow(core->window);
     Mix_CloseAudio();
     TTF_Quit();
     IMG_Quit();
@@ -64,9 +63,5 @@ void Core_Shutdown() {
 
 
 SDL_Renderer* Core_GetRenderer() {
-    return renderer;
-}
-
-void Core_GetWindowSize(int* w, int* h) {
-    SDL_GetWindowSize(window, w, h);
+    return core->renderer;
 }

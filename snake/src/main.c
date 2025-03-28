@@ -1,42 +1,47 @@
-#include "engine/core.h"
-#include "engine/audio.h"
-#include "game/menu.h"
-#include "game/game.h"
+#include "core.h"
+#include "game_state.h"
+#include "audio.h"
+#include "menu.h"
 
-int main(void) {
-    // init engine
-    if (!Core_Init()) {
-        printf("Failed to initialize engine!\n");
-        return -1;
-    }
+int main() {
+    Core core;
+    if (!Core_Init(&core, "Hungry Snake", 800, 600)) return 1;
 
-    // load resource
-    Audio_Load();  // sound and music
+    splash_show(core.renderer);
+
+    Audio_Load();
+
     Menu menu;
-    Menu_Init(&menu, Core_GetRenderer());
+    Menu_Init(&menu, core.renderer);
 
-    // Игровой цикл
-    bool isRunning = true;
-    SDL_Event event;
-
-    while (isRunning) {
+    while (GameState_Set() != GAME_STATE_EXIT) {
+        SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                isRunning = false;
+            if (event.type == SDL_Quit) {
+                GameState_Set(GAME_STATE_EXIT);
             }
-            Menu_HandleEvent(&menu, &event); // Только обработка меню
-        }
 
-        SDL_SetRenderDrawColor(Core_GetRenderer(), 0, 0, 0, 255);
-        SDL_RenderClear(Core_GetRenderer());
-        
-        Menu_Render(&menu, Core_GetRenderer()); // Только рендер меню
-        
-        SDL_RenderPresent(Core_GetRenderer());
-        SDL_Delay(16);
+            switch (GameState_Get()) {
+                case GAME_STATE_MENU:
+                    Menu_HandleEvent(&menu, &event);
+                    break;
+                case GAME_STATE_PLAYING:
+                break;
+            }
+        }
+        SDL_RenderClear(core.renderer);
+        switch (GameState_Get()) {
+            case GAME_STATE_MENU:
+                Menu_Render(&menu, core.renderer);
+                break;
+            case GAME_STATE_PLAYING:
+            break;
+        }
+        SDL_RenderPresent(core.renderer);
     }
 
-    // Resource release
-    Core_Shutdown();
+    Menu_Free(&menu);
+    Audio_Free();
+    Core_Shutdown(&core);
     return 0;
 }

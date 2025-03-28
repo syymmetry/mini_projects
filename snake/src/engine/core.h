@@ -2,17 +2,19 @@
 #define CORE_H
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-bool Core_Init();
-void Core_Shutdown();
-SDL_Renderer* Core_GetRenderer();
-void Core_GetWindowSize(int* w, int* h);
+typedef struct {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    int width;
+    int height;
+} Core;
 
 
+bool Core_Init(Core* core, const char* title, int w, int h);
+void Core_Shutdown(Core* core);
+SDL_Renderer* Core_GetRenderer(Core* core);
 
 #endif

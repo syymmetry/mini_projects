@@ -1,0 +1,34 @@
+# Игнорируем бинарники и исполняемые файлы
+/snake_game
+*.exe
+*.out
+*.app
+
+# Папка сборки (объектные файлы)
+/build/
+/BUILD_DIR/
+*.o
+*.a
+*.so
+*.dll
+
+# Кэш IDE и редакторов
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Логи и системные файлы
+/log.txt
+*.log
+.DS_Store
+Thumbs.db
+
+# Автогенерируемые файлы (если есть)
+/config.json
+/records.json
+
+# Исключения (не игнорируем ассеты!)
+!assets/**/
+!assets/**/*
