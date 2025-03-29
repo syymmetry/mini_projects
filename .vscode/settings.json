@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "audio.h": "c"
+      "*.h": "c",
+      "core.h": "c",
+      "menu.h": "c"
     }
-}
+  }
